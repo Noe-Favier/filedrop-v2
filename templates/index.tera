@@ -1,0 +1,22 @@
+{% extends "base" %}
+{% block title %}Index{% endblock title %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% block content %}
+    <h1 class="m-2">Files List</h1>
+    <div class="container-fluid d-flex justify-content-evenly flex-wrap">
+        {% for file in files %}
+            <div class="card w-25 p-2 m-1">
+                <div class="card-body">
+                    <h5 class="card-title">{{file.name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{file.size/1000}} <strong>Ko</strong></h6>
+                    <p class="card-text">
+                        <span>last modified : <em>{{file.date_last_modified}}</em></span>
+                    </p>
+                    <a href="/file/{{file.name}}" target="_blank" class="card-link">Download</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

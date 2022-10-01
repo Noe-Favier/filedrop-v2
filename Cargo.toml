@@ -1,0 +1,17 @@
+[package]
+name = "filedrop-v2"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = { version = "0.5.0-rc.2", features = ["tls"] }
+tera = { version = "1", default-features = true}
+rocket_dyn_templates = {version = "0.1.0-rc.2", features = ["tera"]}
+rocket-include-static-resources = "0.10.2"
+fsio = "0.4.0"
+dotenv = "0.15.0"
+mime_guess = "2.0.4"
+serde = "1.0.145"
+chrono = "0.4"

@@ -1,0 +1,18 @@
+## defaults for _all_ profiles
+[default]
+address = "0.0.0.0"
+port = 8000
+template_dir = "templates/"
+secret_key = "hPRYyVRiMyxpw5sBB1XeCMN1kFsDCqKvBi2QJxBVHQk="
+
+[default.tls]
+certs = "ssl/cert.crt"
+key = "ssl/key.key"
+
+## set only when compiled in debug mode, i.e, `cargo build`
+[debug]
+
+
+## set only when compiled in release mode, i.e, `cargo build --release`
+## don't use this secret_key! generate your own and keep it private!
+[release]
