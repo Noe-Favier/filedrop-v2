@@ -12,19 +12,13 @@ settings which can be set in [.env](.env) :
 - **files_path** : (*default* : `/files`) > path to the folder where files will be stored
 - **allow_create** : (*default* : `true`) > is FileDrop allowed to create that dir if it doesn't exists ?
 
-
-## tls support : 
-To enable tls support (https), go in the folder [`ssl`](ssl) and then run :
-
-    openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out cert.crt -keyout key.key
-
 ## More conf !
 
 This project was realised with [rocket.rs](https://rocket.rs/). U will find the conf file of the web server in [Rocket.toml](Rocket.toml). 
 
 for example, u will be able to : 
 - change the port 
-- disable tls (removing the `[default.tls]` part)
+- enable tls (=https) (if you can)
 - change the secret key *(see below)*
 
 ### Changing secret_key

@@ -8,11 +8,6 @@ template_dir = "templates/"
 #u can generate one with : `openssl rand -base64 32`
 secret_key = "you'll have to replace that value"
 
-#DELETE THIS IF YOU WANT TO DISABLE TLS : (line 11 -> 14)
-[default.tls]
-certs = "ssl/cert.crt"
-key = "ssl/key.key"
-
 ## set only when compiled in debug mode, i.e, `cargo build`
 [debug]
 
