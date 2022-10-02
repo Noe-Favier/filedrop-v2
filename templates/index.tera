@@ -1,5 +1,5 @@
 {% extends "base" %}
-{% block title %}Index{% endblock title %}
+{% block title %}FileList{% endblock title %}
 {% block head %}
 {{ super() }}
 {% endblock head %}

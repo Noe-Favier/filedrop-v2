@@ -1,3 +1,17 @@
+{# Since ternary doesn't exists in Tera, we have to do this :  #}
+{% if index == "active" %}
+   {% set url_index = "#" %}
+   {% set url_about = "/about" %}
+{% elif about == "active" %}
+   {% set url_index = "../" %}
+   {% set url_about = "#" %}
+{% else %}
+   {% set url_about = "#"%}
+   {% set url_index = "#"%}
+{% endif %}
+{# //\\ #}
+
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -5,12 +19,20 @@
    <meta charset="utf-8" />
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+   
+   <style>
+      html, body {
+         height:100%;
+         width: 100%;
+      }
+   </style>
+
    {% block head %}
    <title>{% block title %}{% endblock title %} - FileDrop</title>
    {% endblock head %}
 </head>
 
-<body>
+<body class="d-flex flex-column align-items-stretch">
    <nav class="navbar navbar-dark bg-dark">
       <div class="container">
          <a class="navbar-brand" href="#">
@@ -19,19 +41,23 @@
          </a>
          <ul class="navbar-nav d-flex flex-row justify-content-evenly w-25">
             <li class="nav-item">
-               <a class="nav-link {{index}}" aria-current="page" href="#">
+               <a class="nav-link {{index}}" aria-current="page" href="{{url_index}}">
                   FileList
                </a>
             </li>
             <li class="nav-item">
-               <a class="nav-link {{about}}" href="#"> About </a>
+               <a class="nav-link {{about}}" href="{{url_about}}">
+                  About
+               </a>
             </li>
          </ul>
       </div>
    </nav>
 
-   <div id="content">{% block content %}{% endblock content %}</div>
-   <div id="footer"></div>
+   <div id="content" class="flex-grow-1">
+      {% block content %}{% endblock content %}
+   </div>
+
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
       crossorigin="anonymous"></script>

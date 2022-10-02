@@ -63,6 +63,14 @@ fn download(name: &str) -> content::RawMsgPack<Option<File>> {
     content::RawMsgPack(File::open(&filename).ok())
 }
 
+#[get("/about")]
+fn about() -> content::RawHtml<Template> {
+    content::RawHtml(Template::render(
+        "about",
+        context! { index: "inactive", about:"active" },
+    ))
+}
+
 #[launch]
 fn rocket() -> _ {
     dotenv().ok();
@@ -89,8 +97,8 @@ fn rocket() -> _ {
             "favicon" => "assets/favicon.ico",
             "folder-img" => "assets/folder-img.svg"
         ))
-        .mount("/", routes![index])
+        .mount("/", routes![index, about])
         .mount("/file", routes![download])
-        .mount("/", routes![favicon, folder_img])
+        .mount("/", routes![favicon, folder_img]) //assets
         .attach(Template::fairing())
 }

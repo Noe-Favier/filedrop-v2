@@ -1,0 +1,17 @@
+{% extends "base" %}
+{% block title %}About{% endblock title %}
+{% block head %}
+    {{ super() }}
+{% endblock head %}
+{% block content %}
+    <div class="d-flex justify-content-center align-items-center flex-column h-100">
+        <div>
+            <p>
+                FileDrop is a webapp written in rust 
+            </p>
+            <p>
+                ⇒ <a href="https://github.com/Noe-Favier/filedrop-v2" target="_blank">See this repository</a>
+            </p>
+        </div>
+    </div>
+{% endblock content %}
