@@ -20,11 +20,17 @@ To enable tls support (https), go in the folder [`ssl`](ssl) and then run :
 
 ## More conf !
 
-This project was realised with [rocket.rs](https://rocket.rs/). U will find the conf file of the web server in [rocket.toml](rocket.toml). 
+This project was realised with [rocket.rs](https://rocket.rs/). U will find the conf file of the web server in [Rocket.toml](Rocket.toml). 
 
 for example, u will be able to : 
 - change the port 
 - disable tls (removing the `[default.tls]` part)
+- change the secret key *(see below)*
+
+### Changing secret_key
+**IMPORTANT !**
+on linux, run `openssl rand -base64 32` and replace the field 'secret_key' with the value returned by that command in [Rocket.toml](Rocket.toml).
+More info about that [here](https://rocket.rs/v0.5-rc/guide/configuration/#secret-key).
 
 # How to run
 

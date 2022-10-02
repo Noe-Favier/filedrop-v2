@@ -3,8 +3,12 @@
 address = "0.0.0.0"
 port = 8000
 template_dir = "templates/"
-secret_key = "hPRYyVRiMyxpw5sBB1XeCMN1kFsDCqKvBi2QJxBVHQk="
 
+#see "https://api.rocket.rs/v0.5-rc/rocket/config/struct.SecretKey.html" for more info about "secret_key"
+#u can generate one with : `openssl rand -base64 32`
+secret_key = "you'll have to replace that value"
+
+#DELETE THIS IF YOU WANT TO DISABLE TLS : (line 11 -> 14)
 [default.tls]
 certs = "ssl/cert.crt"
 key = "ssl/key.key"
