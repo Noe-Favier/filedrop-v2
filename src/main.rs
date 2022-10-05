@@ -2,11 +2,11 @@ use dotenv::dotenv;
 use rocket::response::content;
 use rocket_dyn_templates::{context, Template};
 use std::env;
-use std::fs::DirBuilder;
 use std::string::String;
 use std::time::{SystemTime};
 use std::{fs, path::Path};
-use std::fs::File;
+use std::fs::{File, create_dir_all};
+use rocket::response::Redirect;
 
 mod file_struct;
 
@@ -80,11 +80,14 @@ fn rocket() -> _ {
     if fs::metadata(&file_path).is_err() {
         if env::var("allow_create").unwrap_or(String::from("true")) == String::from("true") {
             //FILE_PATH isn't a folder or doesn't exists, try to create it :
-            let dir_builder: DirBuilder = DirBuilder::new();
-            dir_builder.create(&file_path).unwrap();
+            match create_dir_all(&file_path) {
+                Ok(_) => println!("Created file path at {file_path}", file_path = &file_path),
+                Err(_error) => panic!("can't create folder")
+            }
+            
 
             assert!(fs::metadata(&file_path).unwrap().is_dir()); //stop if it didn't worked
-            println!("Created file path at {file_path}", file_path = &file_path);
+            
         } else {
             println!("Will not create {file_path} because 'allow_create' is disabled in .env", file_path = &file_path);
             panic!("the directory provided does not exists and can't be created")
