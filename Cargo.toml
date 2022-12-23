@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 rocket = { version = "0.5.0-rc.2", features = ["tls"] }
 tera = { version = "1", default-features = true}
+zip = { version = "0.6.3"}
 rocket_dyn_templates = {version = "0.1.0-rc.2", features = ["tera"]}
 rocket-include-static-resources = "0.10.2"
 fsio = "0.4.0"

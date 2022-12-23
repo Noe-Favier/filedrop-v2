@@ -4,19 +4,53 @@
 {{ super() }}
 {% endblock head %}
 {% block content %}
-    <h1 class="m-2">Files List</h1>
-    <div class="container-fluid d-flex justify-content-evenly flex-wrap">
-        {% for file in files %}
-            <div class="card w-25 p-2 m-1">
-                <div class="card-body">
-                    <h5 class="card-title">{{file.name}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{file.size/1000}} <strong>Ko</strong></h6>
-                    <p class="card-text">
-                        <span>last modified : <em>{{file.date_last_modified}}</em></span>
-                    </p>
-                    <a href="/file/{{file.name}}" target="_blank" class="card-link">Download</a>
-                </div>
+<div class="m-2 d-flex justify-content-evenly flex-wrap">
+    {% for dir in dirs %}
+
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">{{ dir.date_last_modified }}</div>
+        <div class="card-body">
+            <h5 class="card-title">{{ dir.name }}</h5>
+
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>total size</span>
+                    <span>≈ <strong>{{ dir.size | filesizeformat }} </strong></span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>file count</span>
+                    <span><strong>{{ dir.files | length }} </strong> </span>
+                </li>
+            </ul>
+
+            <!--  -->
+            <div class="container p-2">
+                <button type="button" class="btn btn-success">Download</button>
             </div>
-        {% endfor %}
+        </div>
     </div>
+
+    <!-- end {{ dir.name }} section -->
+    {% endfor%}
+</div>
+
+
+<h1 class="m-2">Files List</h1>
+<div class="container-fluid d-flex justify-content-evenly flex-wrap">
+    {% for file in files %}
+    <div class="card w-25 p-2 m-1">
+        <div class="card-body">
+            <h5 class="card-title">{{file.name}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                <strong>{{file.size | filesizeformat}}</strong>
+
+            </h6>
+            <p class="card-text">
+                <span>last modified : <em>{{file.date_last_modified}}</em></span>
+            </p>
+            <a href="/file/{{file.name}}" target="_blank" class="card-link">Download</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock content %}
