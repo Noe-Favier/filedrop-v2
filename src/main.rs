@@ -40,22 +40,20 @@ fn index() -> content::RawHtml<Template> {
 
             if entry.file_type().unwrap().is_dir() {
                 //we got a folder
-                let directory = entry;
+                let directory: DirEntry = entry;
                 let filename: String = (directory.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
-                let filesize: u64    = directory.metadata().unwrap().len();
                 let date_lm: SystemTime = directory.metadata().unwrap().modified().unwrap();
 
                 dir_list.push(dir_struct::FileDropDir::new(
                     filename.to_owned(),
-                    filesize.to_owned(),
                     date_lm.to_owned(),
-                    Vec::new()
+                    directory.path()
                 ));
 
 
             } else if entry.file_type().unwrap().is_file() {
                 //we got a file
-                let file = entry;
+                let file: DirEntry = entry;
                 let filename: String = (file.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
                 let filetype: String = mime_guess::from_path(&filename).first_or_octet_stream().to_string();
                 let filesize: u64    = file.metadata().unwrap().len();
