@@ -11,12 +11,12 @@ extern crate serde;
 
 #[derive(Clone, serde::Serialize)]
 pub struct FileDropDir {
-    name: String,
+    pub name: String,
 
-    size: u64,
-    date_last_modified: String,
+    pub size: u64,
+    pub date_last_modified: String,
 
-    files: Vec<FileDropFile>,
+    pub files: Vec<FileDropFile>,
 }
 
 impl FileDropDir {

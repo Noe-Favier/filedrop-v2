@@ -1,5 +1,5 @@
 use dotenv::dotenv;
-use rocket::response::content;
+use rocket::response::content::{self, RawHtml};
 use rocket_dyn_templates::{context, Template};
 use std::env;
 use std::string::String;
@@ -9,6 +9,7 @@ use std::fs::{File, create_dir_all, DirEntry};
 
 mod file_struct;
 mod dir_struct;
+mod dir_zipper;
 
 extern crate tera;
 
@@ -83,6 +84,15 @@ fn download(name: &str) -> content::RawMsgPack<Option<File>> {
     content::RawMsgPack(File::open(&filename).ok())
 }
 
+
+#[get("/<name>")]
+fn download_dir(name: &str) -> String {
+    let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
+    let dirname: String = format!("{dirs}/{name}", dirs = files_path, name = name);
+    content::RawMsgPack(dir_zipper::get_zipped_vec(dirname, files_path));
+    name.to_string()
+}
+
 #[get("/about")]
 fn about() -> content::RawHtml<Template> {
     content::RawHtml(Template::render(
@@ -121,6 +131,7 @@ fn rocket() -> _ {
         ))
         .mount("/", routes![index, about])
         .mount("/file", routes![download])
+        .mount("/dir", routes![download_dir])
         .mount("/", routes![favicon, folder_img]) //assets
         .attach(Template::fairing())
 }
