@@ -1,5 +1,5 @@
 use dotenv::dotenv;
-use rocket::response::content::{self, RawHtml};
+use rocket::response::content::{self};
 use rocket_dyn_templates::{context, Template};
 use std::env;
 use std::string::String;
@@ -81,16 +81,17 @@ fn index() -> content::RawHtml<Template> {
 fn download(name: &str) -> content::RawMsgPack<Option<File>> {
     let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
     let filename: String = format!("{files}/{name}", files = files_path, name = name);
-    content::RawMsgPack(File::open(&filename).ok())
+    return content::RawMsgPack(File::open(&filename).ok())
 }
 
 
-#[get("/<name>")]
-fn download_dir(name: &str) -> String {
+#[get("/<name>/<_formatted_name>")]
+fn download_dir(name: &str, _formatted_name: &str) -> content::RawMsgPack<Option<File>> {
     let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
     let dirname: String = format!("{dirs}/{name}", dirs = files_path, name = name);
-    content::RawMsgPack(dir_zipper::get_zipped_vec(dirname, files_path));
-    name.to_string()
+    let path_to_dir = Path::new(&dirname).to_path_buf();
+    let zipped_dir_path = dir_zipper::zip_dir(path_to_dir).expect("can't zip");
+    return content::RawMsgPack(File::open(&zipped_dir_path).ok());
 }
 
 #[get("/about")]

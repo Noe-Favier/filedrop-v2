@@ -1,54 +1,83 @@
-use std::fs::read_dir;
-use std::path::PathBuf;
-use std::time::SystemTime;
-use std::u8;
-use std::{path, fs::File};
-use rocket::futures::sink::Buffer;
-use zip::write::FileOptions;
-use zip::CompressionMethod;
+/*
+see :
 
-use crate::dir_struct::FileDropDir;
+https://github.com/zip-rs/zip/blob/f6357c59936b51c52146f35c6cf3c15dd206251d/examples/write_dir.rs
+https://docs.rs/tempfile/latest/tempfile/struct.Builder.html
+*/
+use std::fs::File;
+use std::io::{Read, Write};
+use std::path::{Path, PathBuf};
+use tempfile::Builder;
+use walkdir::WalkDir;
+use zip::result::ZipError;
+use zip::{write::FileOptions, CompressionMethod::Deflated, ZipWriter};
 
-#[path = "../dir_struct/mod.rs"] mod dir_struct;
+///zip the dir and return the path to the archive
+pub fn zip_dir(path_to_dir: PathBuf) -> Result<PathBuf, Box<dyn std::error::Error>> {
+    if !path_to_dir.is_dir() {
+        return Err(Box::new(ZipError::FileNotFound));
+    }
 
-pub fn get_zipped_vec(path_to_dir: String, path_to_parent: String) -> Vec<u8> { 
-    //get file
-    let parent = read_dir(path_to_parent).unwrap();
-    let dir = parent.find(|entry| entry.expect("is not a valid ref").path().to_str().unwrap() == (path_to_dir.as_str())).expect("file not found").expect("failed extracting DirEntry");
+    //**************** TEMP FILE CREATION ****************//
 
-    let filename: String = dir.file_name().to_str().expect("can't find requested dir").to_string();
-    let date_lm: SystemTime = dir.metadata().unwrap().modified().unwrap();
+    let dirname: String = path_to_dir
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap_or("unknown")
+        .to_string();
 
-    let dir_to_zip: FileDropDir = FileDropDir::new(
-        filename.to_owned(),
-        date_lm.to_owned(),
-        dir.path()
-    );
+    let named_temp_file = Builder::new().prefix(&dirname).suffix(".zip").tempfile()?;
 
-    let buf: Vec<u8> = Vec::new();
+    let (file, path) = named_temp_file.keep()?;
 
-    let buffer: Buffer<u8>
-    let mut buf: [u8; &dir_to_zip.size as usize] = [];
+    println!("added file to {:?}", path);
 
-    let mut w = std::io::Cursor::new(buf);
-    let mut zip = zip::ZipWriter::new(w);
+    // By closing the `TempDir` explicitly, we can check that it has
+    // been deleted successfully. If we don't close it explicitly,
+    // the directory will still be deleted when `dir` goes out
+    // of scope, but we won't know whether deleting the directory
+    // succeeded.
+    //eg. drop(file);
+    //    dir.close();
 
-    //create a buffer 
-    //size of the buffer based on total size of dir
-    //zip into buffer
-    //return buffer
-    //buffer will be sent to client as raw msg pack 
+    //**************** ZIP THE DIR ****************//
+    let mut zip = ZipWriter::new(file.try_clone()?);
 
-    /*
-    let mut buffer: &'a tempfile::file::NamedTempFile;
-
-    let mut zip = zip::ZipWriter::new(buffer);
     let options = FileOptions::default()
-    .compression_method(CompressionMethod::Deflated)
-    .unix_permissions(0o755);
-    
-    zip.start_file("hello_world.txt", options)?;
-    zip.write(b"Hello, World!")?;
-     */
-    return buf;
+        .compression_method(Deflated)
+        .unix_permissions(0o755);
+
+    let walkdir = WalkDir::new(&path_to_dir);
+    let it = walkdir.into_iter();
+    let mut buffer = Vec::new();
+
+    for entry in it {
+        let dir_entry = entry.unwrap();
+        let path = dir_entry.path();
+        let name = path
+            .strip_prefix(Path::new(path_to_dir.to_str().unwrap()))
+            .unwrap();
+
+        // Write file or directory explicitly
+        // Some unzip tools unzip files with directory paths correctly, some do not!
+        if path.is_file() {
+            #[allow(deprecated)]
+            zip.start_file_from_path(name, options)?;
+            let mut f = File::open(path)?;
+
+            f.read_to_end(&mut buffer)?;
+            zip.write_all(&*buffer)?;
+            buffer.clear();
+        } else if !name.as_os_str().is_empty() {
+            // Only if not root! Avoids path spec / warning
+            // and mapname conversion failed error on unzip
+            #[allow(deprecated)]
+            zip.add_directory_from_path(name, options)?;
+        }
+    }
+
+    zip.finish()?;
+    //**************** RETURN THE FILE ****************//
+    return Result::Ok(path);
 }
