@@ -1,14 +1,15 @@
 use dotenv::dotenv;
-use rocket::response::content;
+use rocket::response::content::{self};
 use rocket_dyn_templates::{context, Template};
 use std::env;
 use std::string::String;
 use std::time::{SystemTime};
 use std::{fs, path::Path};
-use std::fs::{File, create_dir_all};
-use rocket::response::Redirect;
+use std::fs::{File, create_dir_all, DirEntry};
 
 mod file_struct;
+mod dir_struct;
+mod dir_zipper;
 
 extern crate tera;
 
@@ -29,30 +30,50 @@ static_response_handler! {
 fn index() -> content::RawHtml<Template> {
     
     let mut file_list: Vec<file_struct::FileDropFile> = Vec::new();
+    let mut dir_list: Vec<dir_struct::FileDropDir> = Vec::new();
 
     for f in fs::read_dir(Path::new(
         &env::var("files_path").unwrap_or(String::from("./files")),
     ))
     .unwrap()
     {
-        let file = f.unwrap();
-        let filename: String = (file.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
-        let filetype: String = mime_guess::from_path(&filename).first_or_octet_stream().to_string();
-        let filesize: u64    = file.metadata().unwrap().len();
-        let date_lm: SystemTime = file.metadata().unwrap().modified().unwrap();
+        let entry: DirEntry = f.unwrap();
 
+            if entry.file_type().unwrap().is_dir() {
+                //we got a folder
+                let directory: DirEntry = entry;
+                let filename: String = (directory.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
+                let date_lm: SystemTime = directory.metadata().unwrap().modified().unwrap();
+
+                dir_list.push(dir_struct::FileDropDir::new(
+                    filename.to_owned(),
+                    date_lm.to_owned(),
+                    directory.path()
+                ));
+
+
+            } else if entry.file_type().unwrap().is_file() {
+                //we got a file
+                let file: DirEntry = entry;
+                let filename: String = (file.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
+                let filetype: String = mime_guess::from_path(&filename).first_or_octet_stream().to_string();
+                let filesize: u64    = file.metadata().unwrap().len();
+                let date_lm: SystemTime = file.metadata().unwrap().modified().unwrap();
+
+                
+                file_list.push(file_struct::FileDropFile::new(
+                    filename.to_owned(),
+                    filetype.to_owned(),
+                    filesize.to_owned(),
+                    date_lm.to_owned()
+                ));
+        }
         
-        file_list.push(file_struct::FileDropFile::new(
-            filename.to_owned(),
-            filetype.to_owned(),
-            filesize.to_owned(),
-            date_lm.to_owned()
-        ));
     }
 
     content::RawHtml(Template::render(
         "index",
-        context! { index: "active", about:"inactive", files:file_list },
+        context! { index: "active", about:"inactive", files:file_list, dirs:dir_list },
     ))
 }
 
@@ -60,7 +81,17 @@ fn index() -> content::RawHtml<Template> {
 fn download(name: &str) -> content::RawMsgPack<Option<File>> {
     let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
     let filename: String = format!("{files}/{name}", files = files_path, name = name);
-    content::RawMsgPack(File::open(&filename).ok())
+    return content::RawMsgPack(File::open(&filename).ok())
+}
+
+
+#[get("/<name>/<_formatted_name>")]
+fn download_dir(name: &str, _formatted_name: &str) -> content::RawMsgPack<Option<File>> {
+    let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
+    let dirname: String = format!("{dirs}/{name}", dirs = files_path, name = name);
+    let path_to_dir = Path::new(&dirname).to_path_buf();
+    let zipped_dir_path = dir_zipper::zip_dir(path_to_dir).expect("can't zip");
+    return content::RawMsgPack(File::open(&zipped_dir_path).ok());
 }
 
 #[get("/about")]
@@ -84,7 +115,6 @@ fn rocket() -> _ {
                 Ok(_) => println!("Created file path at {file_path}", file_path = &file_path),
                 Err(_error) => panic!("can't create folder")
             }
-            
 
             assert!(fs::metadata(&file_path).unwrap().is_dir()); //stop if it didn't worked
             
@@ -102,6 +132,7 @@ fn rocket() -> _ {
         ))
         .mount("/", routes![index, about])
         .mount("/file", routes![download])
+        .mount("/dir", routes![download_dir])
         .mount("/", routes![favicon, folder_img]) //assets
         .attach(Template::fairing())
 }

@@ -4,19 +4,96 @@
 {{ super() }}
 {% endblock head %}
 {% block content %}
-    <h1 class="m-2">Files List</h1>
-    <div class="container-fluid d-flex justify-content-evenly flex-wrap">
-        {% for file in files %}
-            <div class="card w-25 p-2 m-1">
-                <div class="card-body">
-                    <h5 class="card-title">{{file.name}}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{file.size/1000}} <strong>Ko</strong></h6>
-                    <p class="card-text">
-                        <span>last modified : <em>{{file.date_last_modified}}</em></span>
-                    </p>
-                    <a href="/file/{{file.name}}" target="_blank" class="card-link">Download</a>
+<div class="m-2 d-flex justify-content-evenly flex-wrap">
+    {% for dir in dirs %}
+
+    <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">{{ dir.date_last_modified }}</div>
+        <div class="card-body">
+            <h5 class="card-title">{{ dir.name }}</h5>
+
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>total size</span>
+                    <span>≈ <strong>{{ dir.size | filesizeformat }} </strong></span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between"
+                    data-bs-target="#{{dir.name | urlencode_strict |  replace(from='%', to='\%') }}Modal"
+                    data-bs-toggle="modal">
+                    <span>file count</span>
+                    <span>
+                        <strong><a href="#">{{ dir.files | length }}</a></strong>
+                    </span>
+                </li>
+            </ul>
+
+            <!-- modal displaying files -->
+            <div class="modal fade" id="{{dir.name | urlencode_strict }}Modal" aria-labelledby="files in {{dir.name}}"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Files in <strong>{{ dir.name }}</strong></h5>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">FileName</th>
+                                        <th scope="col">Size</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for file in dir.files %}
+                                    <tr>
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{file.name}}</td>
+                                        <td>{{file.size | filesizeformat}}</td>
+                                    </tr>
+                                    {%endfor%}
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        {% endfor %}
+            <!--  -->
+            <div class="container p-2">
+                <span class="d-inline-block" tabindex="0" {% if not dir.files %} data-bs-toggle="tooltip" title="can't download empty folder" {% endif%}>
+                    <button type="button" class="btn btn-success" {% if not dir.files %}disabled{% endif %}
+                        onclick="window.open('/dir/{{dir.name}}/{{ dir.name | slugify }}.zip', '_blank')">Download</button>
+                </span>
+            </div>
+        </div>
     </div>
+
+    <!-- end {{ dir.name }} section -->
+    {% endfor%}
+</div>
+
+
+<h1 class="m-2">Files List</h1>
+<div class="container-fluid d-flex justify-content-evenly flex-wrap">
+    {% for file in files %}
+    <div class="card w-25 p-2 m-1">
+        <div class="card-body">
+            <h5 class="card-title">{{file.name}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+                <strong>{{file.size | filesizeformat}}</strong>
+
+            </h6>
+            <p class="card-text">
+                <span>last modified : <em>{{file.date_last_modified}}</em></span>
+            </p>
+            <a href="/file/{{file.name}}" target="_blank" class="card-link">Download</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock content %}
