@@ -34,3 +34,9 @@ if you need help :
 - [install rust](https://www.rust-lang.org/tools/install)
 - [compile a rust app](https://doc.rust-lang.org/book/ch01-02-hello-world.html#:~:text=Compiling%20and%20Running%20Are%20Separate%20Steps)
 - [cargo run](https://doc.rust-lang.org/cargo/commands/cargo-run.html#examples)
+
+## Docker
+
+> see [the docker hub repo](https://hub.docker.com/r/noecl/filedrop)
+
+`docker run -p 80:8000 --name filedrop -it -d noecl/filedrop`
