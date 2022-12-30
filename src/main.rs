@@ -39,7 +39,7 @@ fn index() -> content::RawHtml<Template> {
     {
         let entry: DirEntry = f.unwrap();
 
-            if entry.file_type().unwrap().is_dir() {
+            if entry.file_type().unwrap().is_dir() && &env::var("enable_folder").unwrap_or(String::from("false")) == "true" {
                 //we got a folder
                 let directory: DirEntry = entry;
                 let filename: String = (directory.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
