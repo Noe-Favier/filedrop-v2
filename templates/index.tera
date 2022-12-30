@@ -24,11 +24,11 @@
                     data-bs-toggle="modal">
                     <span>file count</span>
                     <span>
-                        <strong><a href="#">{{ dir.files | length }}</a></strong>
+                        <strong>{% if not dir.files %}0{%else%}<a href="#">{{ dir.files | length }}</a>{% endif %}</strong>
                     </span>
                 </li>
             </ul>
-
+            {% if dir.files %}
             <!-- modal displaying files -->
             <div class="modal fade" id="{{dir.name | urlencode_strict }}Modal" aria-labelledby="files in {{dir.name}}"
                 aria-hidden="true">
@@ -66,6 +66,7 @@
                 </div>
             </div>
             <!--  -->
+            {% endif %}
             <div class="container p-2">
                 <span class="d-inline-block" tabindex="0" {% if not dir.files %} data-bs-toggle="tooltip"
                     title="can't download empty folder" {% endif%}>
