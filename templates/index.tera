@@ -4,9 +4,11 @@
 {{ super() }}
 {% endblock head %}
 {% block content %}
+{% if dirs %}
+    <h1 class="m-2">Folder List</h1>
+{% endif %}
 <div class="m-2 d-flex justify-content-evenly flex-wrap">
     {% for dir in dirs %}
-
     <div class="card text-dark bg-light mb-3" style="max-width: 18rem;">
         <div class="card-header">{{ dir.date_last_modified }}</div>
         <div class="card-body">
@@ -65,7 +67,8 @@
             </div>
             <!--  -->
             <div class="container p-2">
-                <span class="d-inline-block" tabindex="0" {% if not dir.files %} data-bs-toggle="tooltip" title="can't download empty folder" {% endif%}>
+                <span class="d-inline-block" tabindex="0" {% if not dir.files %} data-bs-toggle="tooltip"
+                    title="can't download empty folder" {% endif%}>
                     <button type="button" class="btn btn-success" {% if not dir.files %}disabled{% endif %}
                         onclick="window.open('/dir/{{dir.name}}/{{ dir.name | slugify }}.zip', '_blank')">Download</button>
                 </span>
@@ -94,6 +97,8 @@
             <a href="/file/{{file.name}}" target="_blank" class="card-link">Download</a>
         </div>
     </div>
+    {% else %}
+    <h2>No files have been found ┗( T﹏T )┛</h2>
     {% endfor %}
 </div>
 {% endblock content %}

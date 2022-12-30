@@ -38,7 +38,7 @@
    <nav class="navbar navbar-dark bg-dark">
       <div class="container">
          <a class="navbar-brand" href="#">
-            <img src="/folder-img.svg" alt="" width="30" height="24" />
+            <img src="favicon.ico" alt="" width="24" height="24" />
             FileDrop
          </a>
          <ul class="navbar-nav d-flex flex-row justify-content-evenly w-25">

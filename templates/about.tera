@@ -1,17 +1,48 @@
 {% extends "base" %}
 {% block title %}About{% endblock title %}
 {% block head %}
-    {{ super() }}
+{{ super() }}
 {% endblock head %}
 {% block content %}
-    <div class="d-flex justify-content-center align-items-center flex-column h-100">
-        <div>
-            <p>
-                FileDrop is a webapp written in rust 
-            </p>
-            <p>
-                ⇒ <a href="https://github.com/Noe-Favier/filedrop-v2" target="_blank">See this repository</a>
-            </p>
-        </div>
+<div class="d-flex justify-content-center align-items-center flex-column h-100">
+    <div>
+        <p>
+            FileDrop is a webapp written in rust
+        </p>
+        <p>
+            ⇒ <a href="https://github.com/Noe-Favier/filedrop-v2" target="_blank">See this repository</a>
+        </p>
     </div>
+</div>
+
+<footer>
+    <span>credit : </h1>
+        <div class="accordion" id="credit-accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="favicon-heading">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFavicon" aria-expanded="false" aria-controls="collapseFavicon">
+                        Favicon licence
+                    </button>
+                </h2>
+                <div id="collapseFavicon" class="accordion-collapse collapse" aria-labelledby="faviconHeading"
+                    data-bs-parent="#credit-accordion">
+                    <div class="accordion-body">
+                        <img src="favicon.ico"
+                            alt="a folder icon">
+                        This favicon was generated using the following graphics from Twitter Twemoji:
+                        <ul>
+                            <li>Graphics Title: <em>1f4c1.svg</em></li>
+                            <li>Graphics Author: Copyright 2020 Twitter, Inc and other contributors
+                                (<a href="https://github.com/twitter/twemoji">https://github.com/twitter/twemoji</a>)</li>
+                            <li>Graphics Source: <a href="https://github.com/twitter/twemoji/blob/master/assets/svg/1f4c1.svg">https://github.com/twitter/twemoji/blob/master/assets/svg/1f4c1.svg</a>
+                            </li>
+                            <li>Graphics License: CC-BY 4.0 (<a href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a>)</li>
+                            <li>without any modification</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+</footer>
 {% endblock content %}
