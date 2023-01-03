@@ -3,14 +3,14 @@ FROM rust:alpine3.17
     RUN mkdir /builder
     WORKDIR /builder
 
-    COPY . .
-
-    RUN apk upgrade -a 
-
     #Mandatory for build
-    RUN apk add musl-dev  
+    RUN apk upgrade -a 
+    RUN apk add musl-dev git
 
-    #build filedrop-v2 (~600mb)
+    #clone project
+    RUN git clone https://github.com/Noe-Favier/filedrop-v2 .
+
+    #build filedrop-v2
     RUN cargo build --release
 
 
@@ -27,15 +27,13 @@ FROM alpine:latest
     RUN apk add --no-cache openssl
 
     #copy all files from the builder
-    COPY --from=0 /builder/ ./
+    COPY --from=0 /builder/templates ./templates
+    COPY --from=0 /builder/assets ./assets
+    COPY --from=0 /builder/Rocket.toml ./
+    COPY --from=0 /builder/run-filedrop-v2.sh ./
+    COPY --from=0 /builder/.env ./
 
-    #move the exec from ./target to ./
-    RUN mv /filedrop/target/release/filedrop-v2 ./filedrop-v2
-    
-    #remove useless stuff
-    RUN rm -rf /filedrop/target
-    RUN rm -rf /filedrop/src
-    RUN rm -f /Cargo.lock
-    RUN rm -f /Cargo.toml
+    COPY --from=0 /builder/target/release/filedrop-v2 ./filedrop-v2
 
+    RUN chmod u+x ./run-filedrop-v2.sh
     CMD ["/filedrop/run-filedrop-v2.sh"]
