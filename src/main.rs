@@ -3,16 +3,13 @@ mod utils;
 mod routes;
 
 use dotenv::dotenv;
-use rocket::response::content::{self};
-use rocket_dyn_templates::{context, Template};
+use rocket_dyn_templates::Template;
 use std::env;
 use std::string::String;
-use std::time::{SystemTime};
-use std::{fs, path::Path};
-use std::fs::{File, create_dir_all, DirEntry};
+use std::fs;
+use std::fs::create_dir_all;
 
-use model::{dir_struct, file_struct};
-use utils::{dir_zipper};
+use routes::{about::about, download_dir::download_dir, download_file::download, index::index};
 
 extern crate tera;
 extern crate mime_guess;
@@ -26,82 +23,6 @@ extern crate rocket_include_static_resources;
 static_response_handler! {
     "/favicon.ico" => favicon => "favicon",
     "/folder-img.svg" => folder_img => "folder-img"
-}
-
-#[get("/")]
-fn index() -> content::RawHtml<Template> {
-    
-    let mut file_list: Vec<file_struct::FileDropFile> = Vec::new();
-    let mut dir_list: Vec<dir_struct::FileDropDir> = Vec::new();
-
-    for f in fs::read_dir(Path::new(
-        &env::var("files_path").unwrap_or(String::from("./files")),
-    ))
-    .unwrap()
-    {
-        let entry: DirEntry = f.unwrap();
-
-            if entry.file_type().unwrap().is_dir() && &env::var("enable_folder").unwrap_or(String::from("false")) == "true" {
-                //we got a folder
-                let directory: DirEntry = entry;
-                let filename: String = (directory.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
-                let date_lm: SystemTime = directory.metadata().unwrap().modified().unwrap();
-
-                dir_list.push(dir_struct::FileDropDir::new(
-                    filename.to_owned(),
-                    date_lm.to_owned(),
-                    directory.path()
-                ));
-
-
-            } else if entry.file_type().unwrap().is_file() {
-                //we got a file
-                let file: DirEntry = entry;
-                let filename: String = (file.file_name().to_str().ok_or("/invalid filename/")).unwrap().to_string();
-                let filetype: String = mime_guess::from_path(&filename).first_or_octet_stream().to_string();
-                let filesize: u64    = file.metadata().unwrap().len();
-                let date_lm: SystemTime = file.metadata().unwrap().modified().unwrap();
-
-                
-                file_list.push(file_struct::FileDropFile::new(
-                    filename.to_owned(),
-                    filetype.to_owned(),
-                    filesize.to_owned(),
-                    date_lm.to_owned()
-                ));
-        }
-        
-    }
-
-    content::RawHtml(Template::render(
-        "index",
-        context! { index: "active", about:"inactive", files:file_list, dirs:dir_list },
-    ))
-}
-
-#[get("/<name>")]
-fn download(name: &str) -> content::RawMsgPack<Option<File>> {
-    let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
-    let filename: String = format!("{files}/{name}", files = files_path, name = name);
-    return content::RawMsgPack(File::open(&filename).ok())
-}
-
-
-#[get("/<name>/<_formatted_name>")]
-fn download_dir(name: &str, _formatted_name: &str) -> content::RawMsgPack<Option<File>> {
-    let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
-    let dirname: String = format!("{dirs}/{name}", dirs = files_path, name = name);
-    let path_to_dir = Path::new(&dirname).to_path_buf();
-    let zipped_dir_path = dir_zipper::zip_dir(path_to_dir).expect("can't zip");
-    return content::RawMsgPack(File::open(&zipped_dir_path).ok());
-}
-
-#[get("/about")]
-fn about() -> content::RawHtml<Template> {
-    content::RawHtml(Template::render(
-        "about",
-        context! { index: "inactive", about:"active" },
-    ))
 }
 
 #[launch]

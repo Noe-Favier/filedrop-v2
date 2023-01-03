@@ -5,7 +5,7 @@ use std::{
     time::SystemTime,
 };
 
-use crate::file_struct::FileDropFile;
+use super::file_struct::FileDropFile;
 
 extern crate serde;
 
