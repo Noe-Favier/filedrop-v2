@@ -22,7 +22,6 @@ extern crate rocket_include_static_resources;
 
 static_response_handler! {
     "/favicon.ico" => favicon => "favicon",
-    "/folder-img.svg" => folder_img => "folder-img"
 }
 
 #[launch]
@@ -56,6 +55,6 @@ fn rocket() -> _ {
         .mount("/", routes![index, about])
         .mount("/file", routes![download])
         .mount("/dir", routes![download_dir])
-        .mount("/", routes![favicon, folder_img]) //assets
+        .mount("/", routes![favicon]) //assets
         .attach(Template::fairing())
 }
