@@ -1,3 +1,7 @@
+mod model;
+mod utils;
+mod routes;
+
 use dotenv::dotenv;
 use rocket::response::content::{self};
 use rocket_dyn_templates::{context, Template};
@@ -7,12 +11,10 @@ use std::time::{SystemTime};
 use std::{fs, path::Path};
 use std::fs::{File, create_dir_all, DirEntry};
 
-mod file_struct;
-mod dir_struct;
-mod dir_zipper;
+use model::{dir_struct, file_struct};
+use utils::{dir_zipper};
 
 extern crate tera;
-
 extern crate mime_guess;
 
 #[macro_use]
