@@ -7,32 +7,12 @@ https://docs.rs/tempfile/latest/tempfile/struct.Builder.html
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use tempfile::Builder;
 use walkdir::WalkDir;
-use zip::result::ZipError;
+
 use zip::{write::FileOptions, CompressionMethod::Deflated, ZipWriter};
 
 ///zip the dir and return the path to the archive
-pub fn zip_dir(path_to_dir: PathBuf) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    if !path_to_dir.is_dir() {
-        return Err(Box::new(ZipError::FileNotFound));
-    }
-
-    //**************** TEMP FILE CREATION ****************//
-
-    let dirname: String = path_to_dir
-        .file_name()
-        .unwrap()
-        .to_str()
-        .unwrap_or("unknown")
-        .to_string();
-
-    let named_temp_file = Builder::new().prefix(&dirname).suffix(".zip").tempfile()?;
-
-    let (file, path) = named_temp_file.keep()?;
-
-    println!("added file to {:?}", path);
-
+pub fn zip_dir(path_to_dir: PathBuf, dest: &File) -> Result<bool, Box<dyn std::error::Error>> {
     // By closing the `TempDir` explicitly, we can check that it has
     // been deleted successfully. If we don't close it explicitly,
     // the directory will still be deleted when `dir` goes out
@@ -42,7 +22,7 @@ pub fn zip_dir(path_to_dir: PathBuf) -> Result<PathBuf, Box<dyn std::error::Erro
     //    dir.close();
 
     //**************** ZIP THE DIR ****************//
-    let mut zip = ZipWriter::new(file.try_clone()?);
+    let mut zip = ZipWriter::new(dest.try_clone()?);
 
     let options = FileOptions::default()
         .compression_method(Deflated)
@@ -79,5 +59,5 @@ pub fn zip_dir(path_to_dir: PathBuf) -> Result<PathBuf, Box<dyn std::error::Erro
 
     zip.finish()?;
     //**************** RETURN THE FILE ****************//
-    return Result::Ok(path);
+    return Ok(true);
 }
