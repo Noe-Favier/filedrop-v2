@@ -11,15 +11,7 @@ use walkdir::WalkDir;
 
 use zip::{write::FileOptions, CompressionMethod::Deflated, ZipWriter};
 
-///zip the dir and return the path to the archive
 pub fn zip_dir(path_to_dir: PathBuf, dest: &File) -> Result<bool, Box<dyn std::error::Error>> {
-    // By closing the `TempDir` explicitly, we can check that it has
-    // been deleted successfully. If we don't close it explicitly,
-    // the directory will still be deleted when `dir` goes out
-    // of scope, but we won't know whether deleting the directory
-    // succeeded.
-    //eg. drop(file);
-    //    dir.close();
 
     //**************** ZIP THE DIR ****************//
     let mut zip = ZipWriter::new(dest.try_clone()?);

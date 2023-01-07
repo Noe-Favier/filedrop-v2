@@ -1,8 +1,8 @@
 use std::{fs::File, path::Path};
-use rocket::{response::content};
+use rocket::response::content;
 use rocket::response::status::NotFound;
 use std::env;
-use tempfile::{tempfile, NamedTempFile};
+use tempfile::NamedTempFile;
 
 use crate::utils::dir_zipper::zip_dir;
 
@@ -18,8 +18,6 @@ pub fn download_dir(name: &str, _formatted_name: &str) -> Result<content::RawMsg
 
     //**************** TEMP FILE CREATION ****************//
     let tempfile = NamedTempFile::new().expect("can't create empty temp file");
-
-    println!("added file to {:?}", &tempfile.as_file());
 
     zip_dir(path_to_dir, tempfile.as_file()).expect("can't zip");
     return Ok(content::RawMsgPack(Some(tempfile.reopen().expect("can't reopen the temp file"))));
