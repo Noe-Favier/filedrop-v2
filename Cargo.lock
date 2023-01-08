@@ -437,11 +437,8 @@ version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68c186a7418a2aac330bb76cde82f16c36b03a66fb91db32d20214311f9f6545"
 dependencies = [
- "bitflags",
- "byteorder",
  "diesel_derives",
- "itoa",
- "pq-sys",
+ "libsqlite3-sys",
 ]
 
 [[package]]
@@ -1021,6 +1018,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "329c933548736bc49fd575ee68c89e8be4d260064184389a5b77517cddd99ffb"
 
 [[package]]
+name = "libsqlite3-sys"
+version = "0.25.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29f835d03d717946d28b1d1ed632eb6f0e24a299388ee623d0c23118d3e8a7fa"
+dependencies = [
+ "pkg-config",
+ "vcpkg",
+]
+
+[[package]]
 name = "lock_api"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1472,15 +1479,6 @@ name = "ppv-lite86"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eb9f9e6e233e5c4a35559a617bf40a4ec447db2e84c20b55a6f83167b7e57872"
-
-[[package]]
-name = "pq-sys"
-version = "0.4.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b845d6d8ec554f972a2c5298aad68953fd64e7441e846075450b44656a016d1"
-dependencies = [
- "vcpkg",
-]
 
 [[package]]
 name = "proc-macro-error"
