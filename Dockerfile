@@ -8,7 +8,7 @@ FROM rust:alpine3.17
     RUN apk add musl-dev git
 
     #clone project
-    RUN git clone https://github.com/Noe-Favier/filedrop-v2 .
+    COPY . .
 
     #build filedrop-v2
     RUN cargo build --release
@@ -23,8 +23,7 @@ FROM alpine:latest
     WORKDIR /filedrop
 
     #needed to create secret in Rocket.toml with run-filedrop-v2.sh
-    RUN apk upgrade -a
-    RUN apk add --no-cache openssl
+    RUN apk -U add --no-cache openssl
 
     #copy all files from the builder
     COPY --from=0 /builder/templates ./templates
