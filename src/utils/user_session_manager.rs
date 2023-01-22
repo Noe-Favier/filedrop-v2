@@ -14,10 +14,8 @@ fn get_user_from_token(token: String) -> User{
     let token_decoded = User::decode(token);
     if token_decoded.is_ok() {
         let user_registered_in_token = token_decoded.unwrap().get_user();
-        println!("{:#?}", user_registered_in_token);
         return user_registered_in_token;
     }
-    println!("token unreadable : giving default user");
     return get_anonymous_user();
 }
 
@@ -25,7 +23,6 @@ fn get_user_from_token(token: String) -> User{
 
 pub fn get_user_from_cookie(cookie_jar: CookieJar) -> User {
     let token = get_cookie_value(cookie_jar);
-    println!("cookie = {}", token);
     return get_user_from_token(token);
 }
 
