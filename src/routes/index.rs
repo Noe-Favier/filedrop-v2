@@ -1,13 +1,16 @@
 use std::{fs::{read_dir, DirEntry}, path::Path, time::SystemTime};
 use rocket_dyn_templates::{context, Template};
-use rocket::response::content;
+use rocket::{response::content};
+use rocket::http::{CookieJar};
 use std::env;
 
+use crate::{utils::user_session_manager, model::user::User};
 use crate::model::{dir_struct::FileDropDir, file_struct::FileDropFile};
 
 #[get("/")]
-pub fn index() -> content::RawHtml<Template> {
-    
+pub fn index(jar: &CookieJar<'_>) -> content::RawHtml<Template> {
+    let user: User = user_session_manager::get_user_from_cookie(jar.to_owned());
+
     let mut file_list: Vec<FileDropFile> = Vec::new();
     let mut dir_list: Vec<FileDropDir> = Vec::new();
 
@@ -52,6 +55,6 @@ pub fn index() -> content::RawHtml<Template> {
 
     content::RawHtml(Template::render(
         "index",
-        context! { index: "active", about:"inactive", files:file_list, dirs:dir_list },
+        context! { index: "active", about:"inactive", files:file_list, dirs:dir_list, user:user },
     ))
 }

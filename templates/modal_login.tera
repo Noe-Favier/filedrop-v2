@@ -1,0 +1,78 @@
+{% block login_modal %}
+{% if user %}
+<!-- modal displaying files -->
+<div class="modal fade" id="LoginModal" aria-labelledby="Login form" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="login">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Login</strong></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% if not connected %}
+                <form method="post" action="/login" id="LoginForm">
+                    <div class="form-group">
+                      <label for="usernameInput">Username</label>
+                      <input type="text" class="form-control" id="usernameInput">
+                    </div>
+                    <div class="form-group">
+                      <label for="passwordInput">Password</label>
+                      <input type="password" class="form-control" id="passwordInput">
+                    </div>
+                </form>
+                {% else %}
+                    <div style="width: 100%; text-align: center;">
+                        <p>connected as <strong>{{user.username}}</strong></p>
+                        <button type="button" class="btn btn-warning" onclick="logout();">Logout</button>
+                    </div>
+                {% endif %}
+            </div>
+            <script>
+                function logout() {
+                    const response = fetch('/logout', {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                          'Content-Type': 'application/json'
+                          // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify({}) // body data type must match "Content-Type" header
+                      }).finally(() => location.reload());
+                }
+
+                function validate_form() {
+                    let username = document.getElementById('usernameInput').value;
+                    let passwd = document.getElementById('passwordInput').value;
+
+                    const response = fetch('/login', {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        mode: 'cors', // no-cors, *cors, same-origin
+                        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                        credentials: 'same-origin', // include, *same-origin, omit
+                        headers: {
+                          'Content-Type': 'application/json'
+                          // 'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        redirect: 'follow', // manual, *follow, error
+                        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                        body: JSON.stringify({username: username, passwd: passwd}) // body data type must match "Content-Type" header
+                      }).finally(() => location.reload());
+
+                }
+            </script>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="validate_form();">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--  -->
+{% endif %}
+{% endblock login_modal %}

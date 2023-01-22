@@ -1,6 +1,8 @@
 mod model;
 mod utils;
 mod routes;
+mod repository;
+mod form;
 
 use dotenv::dotenv;
 use rocket_dyn_templates::Template;
@@ -9,7 +11,7 @@ use std::string::String;
 use std::fs;
 use std::fs::create_dir_all;
 
-use routes::{about::about, download_dir::download_dir, download_file::download, index::index};
+use routes::{about::about, download_dir::download_dir, download_file::download, index::index, login::login, logout::logout};
 
 extern crate tera;
 extern crate mime_guess;
@@ -50,9 +52,8 @@ fn rocket() -> _ {
     rocket::build()
         .attach(static_resources_initializer!(
             "favicon" => "assets/favicon.ico",
-            "folder-img" => "assets/folder-img.svg"
         ))
-        .mount("/", routes![index, about])
+        .mount("/", routes![index, about, login, logout])
         .mount("/file", routes![download])
         .mount("/dir", routes![download_dir])
         .mount("/", routes![favicon]) //assets

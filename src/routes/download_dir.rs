@@ -4,10 +4,11 @@ use rocket::response::status::NotFound;
 use std::env;
 use tempfile::NamedTempFile;
 
+use crate::model::user::User;
 use crate::utils::dir_zipper::zip_dir;
 
 #[get("/<name>/<_formatted_name>")]
-pub fn download_dir(name: &str, _formatted_name: &str) -> Result<content::RawMsgPack<Option<File>>, NotFound<String>> {
+pub fn download_dir(name: &str, _formatted_name: &str, _user: User) -> Result<content::RawMsgPack<Option<File>>, NotFound<String>> {
     let files_path: String = env::var("files_path").unwrap_or(String::from("./files"));
     let dirname: String = format!("{dirs}/{name}", dirs = files_path, name = name);
     let path_to_dir = Path::new(&dirname).to_path_buf();

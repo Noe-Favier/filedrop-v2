@@ -9,6 +9,16 @@
 {% set url_about = "#"%}
 {% set url_index = "#"%}
 {% endif %}
+
+{% if user %}
+{% if user.id != -1 %}
+{% set connected = true %}
+{% set user_statut = user.username %}
+{% else %}
+{% set connected = false %}
+{% set user_statut = "Not Logged" %}
+{% endif %}
+{% endif %}
 {# //\\ #}
 
 
@@ -26,6 +36,24 @@
       body {
          height: 100%;
          width: 100%;
+      }
+
+      #connected.true {
+         color: greenyellow;
+      }
+
+      #connected.false {
+         color: red;
+      }
+
+      #connected.false:hover {
+         cursor: pointer;
+         color: darkred;
+      }
+
+      #connected.true:hover {
+         cursor: pointer;
+         color: green;
       }
    </style>
 
@@ -52,6 +80,17 @@
                   About
                </a>
             </li>
+            {% if user %}
+            <li class="nav-item ">
+               <a id="connected" class="nav-link active {{connected}}" data-bs-target="#LoginModal"
+                  data-bs-toggle="modal">
+                  {{user_statut}}
+               </a>
+            </li>
+            <!-- -->
+            {% include "modal_login" %}
+            <!-- -->
+            {% endif %}
          </ul>
       </div>
    </nav>
