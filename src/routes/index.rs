@@ -1,4 +1,4 @@
-use std::{fs::{read_dir, DirEntry}, path::Path, time::SystemTime};
+use std::{fs::{read_dir, DirEntry}, path::{Path, PathBuf}, time::SystemTime};
 use rocket_dyn_templates::{context, Template};
 use rocket::{response::content};
 use rocket::http::{CookieJar};
@@ -41,13 +41,14 @@ pub fn index(jar: &CookieJar<'_>) -> content::RawHtml<Template> {
                 let filetype: String = mime_guess::from_path(&filename).first_or_octet_stream().to_string();
                 let filesize: u64    = file.metadata().unwrap().len();
                 let date_lm: SystemTime = file.metadata().unwrap().modified().unwrap();
-
+                let file_path: PathBuf = file.path();
                 
                 file_list.push(FileDropFile::new(
                     filename.to_owned(),
                     filetype.to_owned(),
                     filesize.to_owned(),
-                    date_lm.to_owned()
+                    date_lm.to_owned(),
+                    file_path.to_owned(),
                 ));
         }
         

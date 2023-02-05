@@ -17,10 +17,17 @@ pub struct FileDropDir {
     pub date_last_modified: String,
 
     pub files: Vec<FileDropFile>,
+
+    pub locked: bool,
+    pub pass_hash: String,
 }
 
 impl FileDropDir {
-    pub fn new(name: String, dlm: SystemTime, path_to_dir: PathBuf) -> FileDropDir {
+    pub fn new(
+        name: String, 
+        dlm: SystemTime, 
+        path_to_dir: PathBuf,
+    ) -> FileDropDir {
         let dt: DateTime<Local> = dlm.clone().into();
 
         return FileDropDir {
@@ -28,6 +35,26 @@ impl FileDropDir {
             size: self::FileDropDir::get_total_size(&path_to_dir),
             date_last_modified: format!("{}", dt.format("%v - %T")),
             files: self::FileDropDir::get_file_list(&path_to_dir),
+            locked: false,
+            pass_hash: String::from(""),
+        };
+    }
+    
+    pub fn new_locked_dir(
+        name: String, 
+        dlm: SystemTime, 
+        path_to_dir: PathBuf,
+        pass_hash: String,
+    ) -> FileDropDir {
+        let dt: DateTime<Local> = dlm.clone().into();
+
+        return FileDropDir {
+            name: name,
+            size: self::FileDropDir::get_total_size(&path_to_dir),
+            date_last_modified: format!("{}", dt.format("%v - %T")),
+            files: self::FileDropDir::get_file_list(&path_to_dir),
+            locked: true,
+            pass_hash: pass_hash,
         };
     }
 
@@ -67,6 +94,7 @@ impl FileDropDir {
                             .to_string(),
                         file.metadata().unwrap().len(),
                         file.metadata().unwrap().modified().unwrap(),
+                        file.path(),
                     ));
                 }
             }
