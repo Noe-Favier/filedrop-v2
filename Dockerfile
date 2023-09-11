@@ -5,7 +5,7 @@ FROM rust:alpine3.17
 
     #Mandatory for build
     RUN apk upgrade -a 
-    RUN apk add musl-dev git
+    RUN apk add musl-dev
 
     #clone project
     COPY . .
