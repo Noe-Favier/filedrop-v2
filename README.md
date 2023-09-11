@@ -4,8 +4,18 @@
 
 this web app is a reengineering of [FileDrop V1](https://github.com/Noe-Favier/file_drop) which is a rust app created without any dependency.
 
-Here, FileDrop V2 was realised with **A LOT** of lib. Furthermore, it was realised insanely fastser (and working better)
-(*4Hours for V2 // +10Hours V1*) to achieve the same thing.
+Here, FileDrop V2 was realized with **A LOT** of lib (the most i could). Furthermore, it was realised insanely faster (and working better)
+(*4Hours for V2 // +10Hours V1*) to achieve the same thing (even if i was learning the language in the first place).
+
+## stuff i'll do
+
+just finishing another project rn but i'll add those features next :
+
+- [ ] security (locking specific files with psswd) (+ an optional master password to get on the app)
+- [ ] admin panel (in order to have some stats + setup security psswds)
+- [ ] upload button
+- [ ] a CSS rework (drop bootstrap + responsive)
+- [ ] stay "easy to setup" and multiplatform
 
 ## Demo
 
@@ -27,7 +37,7 @@ This project was realised with [rocket.rs](https://rocket.rs/). U will find the 
 for example, u will be able to :
 
 - change the port
-- enable tls (=https) (if you can)
+- enable tls (=https) (if you can) (i would do a reverse proxy)
 - change the secret key *(see below)*
 
 ### Changing secret_key
