@@ -5,7 +5,7 @@
 {% endblock head %}
 {% block content %}
 {% if dirs %}
-    <h1 class="m-2">Folder List</h1>
+<h1 class="m-2">Folder List</h1>
 {% endif %}
 <div class="m-2 d-flex justify-content-evenly flex-wrap">
     {% for dir in dirs %}
@@ -24,7 +24,8 @@
                     data-bs-toggle="modal">
                     <span>file count</span>
                     <span>
-                        <strong>{% if not dir.files %}0{%else%}<a href="#">{{ dir.files | length }}</a>{% endif %}</strong>
+                        <strong>{% if not dir.files %}0{%else%}<a href="#">{{ dir.files | length }}</a>{% endif
+                            %}</strong>
                     </span>
                 </li>
             </ul>
@@ -32,7 +33,7 @@
             <!-- modal displaying files -->
             <div class="modal fade" id="{{dir.name | urlencode_strict }}Modal" aria-labelledby="files in {{dir.name}}"
                 aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 45vw;">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Files in <strong>{{ dir.name }}</strong></h5>
@@ -52,9 +53,9 @@
                                 <tbody>
                                     {% for file in dir.files %}
                                     <tr>
-                                        <th scope="row">{{loop.index}}</th>
-                                        <td>{{file.name}}</td>
-                                        <td>{{file.size | filesizeformat}}</td>
+                                        <th scope="row">{{ loop.index }}</th>
+                                        <td style="overflow-x: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 33vw !important">{{ file.name }}</td>
+                                        <td>{{ file.size | filesizeformat }}</td>
                                     </tr>
                                     {%endfor%}
                             </table>
