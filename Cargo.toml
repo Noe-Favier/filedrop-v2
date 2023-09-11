@@ -27,6 +27,3 @@ chrono = "0.4"
 zip = { version = "0.6.3"}
 tempfile = "3.3.0"
 walkdir = "2.3.2"
-
-#DB (security)
-diesel = { version = "2.0.0", features = ["postgres"] }
