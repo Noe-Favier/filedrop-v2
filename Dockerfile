@@ -15,7 +15,7 @@ FROM rust:alpine3.17
 
 
 #RUNNER
-FROM alpine:latest
+FROM alpine:3.18.3
     VOLUME ["/var/file_drop_files"]
     EXPOSE 8000
 
@@ -35,4 +35,9 @@ FROM alpine:latest
     COPY --from=0 /builder/target/release/filedrop-v2 ./filedrop-v2
 
     RUN chmod u+x ./run-filedrop-v2.sh
-    CMD ["/filedrop/run-filedrop-v2.sh"]
+    
+    #remove windows line endings
+    RUN tr -d '\015' < ./run-filedrop-v2.sh > ./run-filedrop-v2.sh 
+
+    ENTRYPOINT ["/bin/sh", "/filedrop/run-filedrop-v2.sh"]
+    #CMD ["tail", "-f", "/dev/urandom"]
