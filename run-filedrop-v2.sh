@@ -10,4 +10,4 @@ then
     echo "has replaced secret key"
 fi
 
-exec /filedrop/filedrop-v2
+/filedrop/filedrop-v2

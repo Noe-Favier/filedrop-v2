@@ -35,9 +35,5 @@ FROM alpine:3.18.3
     COPY --from=0 /builder/target/release/filedrop-v2 ./filedrop-v2
 
     RUN chmod u+x ./run-filedrop-v2.sh
-    
-    #remove windows line endings
-    RUN tr -d '\015' < ./run-filedrop-v2.sh > ./run-filedrop-v2.sh 
 
     ENTRYPOINT ["/bin/sh", "/filedrop/run-filedrop-v2.sh"]
-    #CMD ["tail", "-f", "/dev/urandom"]
