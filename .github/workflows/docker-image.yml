@@ -1,19 +1,9 @@
 name: ci
 
 on:
-  schedule:
-    - cron: "0 10 * * *"
   push:
-    branches:
-      - "master"
     tags:
       - "v*.*.*"
-  pull_request:
-    branches:
-      - "main"
-      - "master"
-      - "ci"
-
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -30,13 +20,7 @@ jobs:
             
           # generate Docker tags based on the following events/attributes
           tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha            
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
