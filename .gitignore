@@ -1,7 +1,6 @@
 /target
+.idea
 
 ssl/cert.crt
-
 ssl/key.key
-
 compose-dev.yaml
