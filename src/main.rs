@@ -1,24 +1,19 @@
+extern crate mime_guess;
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate rocket_include_static_resources;
 mod model;
 mod utils;
 mod routes;
 
 use dotenv::dotenv;
-use rocket_dyn_templates::Template;
 use std::env;
-use std::string::String;
 use std::fs;
 use std::fs::create_dir_all;
+use std::string::String;
 
-use routes::{about::about, download_dir::download_dir, download_file::download, index::index};
-
-extern crate tera;
-extern crate mime_guess;
-
-#[macro_use]
-extern crate rocket;
-
-#[macro_use]
-extern crate rocket_include_static_resources;
+use routes::{download_dir::download_dir, download_file::download, index::index};
 
 static_response_handler! {
     "/favicon.ico" => favicon => "favicon",
@@ -39,7 +34,7 @@ fn rocket() -> _ {
             }
 
             assert!(fs::metadata(&file_path).unwrap().is_dir()); //stop if it didn't worked
-            
+
         } else {
             println!("Will not create {file_path} because 'allow_create' is disabled in .env", file_path = &file_path);
             panic!("the directory provided does not exists and can't be created")
@@ -52,9 +47,8 @@ fn rocket() -> _ {
             "favicon" => "assets/favicon.ico",
             "folder-img" => "assets/folder-img.svg"
         ))
-        .mount("/", routes![index, about])
+        .mount("/", routes![index])
         .mount("/file", routes![download])
         .mount("/dir", routes![download_dir])
         .mount("/", routes![favicon]) //assets
-        .attach(Template::fairing())
 }

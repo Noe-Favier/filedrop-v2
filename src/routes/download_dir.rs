@@ -20,5 +20,5 @@ pub fn download_dir(name: &str, _formatted_name: &str) -> Result<content::RawMsg
     let tempfile = NamedTempFile::new().expect("can't create empty temp file");
 
     zip_dir(path_to_dir, tempfile.as_file()).expect("can't zip");
-    return Ok(content::RawMsgPack(Some(tempfile.reopen().expect("can't reopen the temp file"))));
+    Ok(content::RawMsgPack(Some(tempfile.reopen().expect("can't reopen the temp file"))))
 }

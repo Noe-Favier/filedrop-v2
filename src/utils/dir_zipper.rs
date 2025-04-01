@@ -5,18 +5,18 @@ https://github.com/zip-rs/zip/blob/f6357c59936b51c52146f35c6cf3c15dd206251d/exam
 https://docs.rs/tempfile/latest/tempfile/struct.Builder.html
 */
 use std::fs::File;
+use walkdir::WalkDir;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
-
 use zip::{write::FileOptions, CompressionMethod::Deflated, ZipWriter};
+
 
 pub fn zip_dir(path_to_dir: PathBuf, dest: &File) -> Result<bool, Box<dyn std::error::Error>> {
 
     //**************** ZIP THE DIR ****************//
     let mut zip = ZipWriter::new(dest.try_clone()?);
 
-    let options = FileOptions::default()
+    let options: FileOptions<()> = FileOptions::default()
         .compression_method(Deflated)
         .unix_permissions(0o755);
 

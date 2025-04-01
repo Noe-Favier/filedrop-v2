@@ -1,9 +1,8 @@
-use chrono::prelude::{DateTime, Local};
-use std::{env, fs::read_dir, path::PathBuf, time::SystemTime};
-
-use super::file_struct::FileDropFile;
-
 extern crate serde;
+use super::file_struct::FileDropFile;
+use std::{env, fs::read_dir, path::PathBuf, time::SystemTime};
+use chrono::prelude::{DateTime, Local};
+use std::fs::DirEntry;
 
 #[derive(Clone, serde::Serialize)]
 pub struct FileDropDir {
@@ -44,54 +43,36 @@ impl FileDropDir {
     }
 
     pub fn get_file_list(path: &PathBuf, sub: bool) -> Vec<FileDropFile> {
-        //sub is used to mark file with full path
-        let mut temp_list: Vec<FileDropFile> = Vec::new();
-
-        let entries = read_dir(path);
-
-        if entries.is_ok() {
-            for f in entries.unwrap() {
-                if f.is_err() {
-                    continue;
-                }
-                let f = f.unwrap();
-                if f.path().is_file() {
-                    let file = f;
-
-                    let filename: String;
-                    if sub {
-                        filename = file
-                            .path()
-                            .to_str()
-                            .unwrap_or("/invalid sub file name/")
-                            .to_string()
-                            .replace(
-                                &env::var("files_path").unwrap_or(String::from("./files")),
-                                ".",
-                            );
-                    } else {
-                        filename = file
-                            .file_name()
-                            .to_str()
-                            .ok_or("/invalid filename/")
-                            .unwrap()
-                            .to_string();
-                    }
-
-                    temp_list.push(FileDropFile::new(
-                        filename,
-                        mime_guess::from_path(file.path())
-                            .first_or_octet_stream()
-                            .to_string(),
-                        file.metadata().unwrap().len(),
-                        file.metadata().unwrap().modified().unwrap(),
-                    ));
+        read_dir(path).unwrap()
+            .filter_map(|entry| entry.ok())
+            .flat_map(|entry| {
+                if entry.path().is_file() {
+                    vec![FileDropDir::create_file_drop_file(entry, sub)].into_iter()
                 } else {
-                    temp_list.append(&mut Self::get_file_list(&f.path(), true));
+                    Self::get_file_list(&entry.path(), true).into_iter()
                 }
-            }
-        }
+            })
+            .collect()
+    }
 
-        return temp_list;
+    fn create_file_drop_file(file: DirEntry, sub: bool) -> FileDropFile {
+        let filename = if sub {
+            file.path()
+                .to_str()
+                .unwrap_or("/invalid sub file name/")
+                .replace(&env::var("files_path").unwrap_or_else(|_| "./files".to_string()), ".")
+        } else {
+            file.file_name()
+                .to_str()
+                .unwrap_or("/invalid filename/")
+                .to_string()
+        };
+
+        FileDropFile::new(
+            filename,
+            mime_guess::from_path(file.path()).first_or_octet_stream().to_string(),
+            file.metadata().unwrap().len(),
+            file.metadata().unwrap().modified().unwrap(),
+        )
     }
 }
