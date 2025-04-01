@@ -59,4 +59,4 @@ if you need help :
 
 > see [the docker hub repo](https://hub.docker.com/r/noecl/filedrop)
 
-`docker run -p 80:8000 --name filedrop -it -d noecl/filedrop`
+`docker run -p 8000:8000 --name filedrop -v /var/where_you_want:/var/file_drop_files -it -d noecl/filedrop`
