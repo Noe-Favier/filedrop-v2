@@ -1,55 +1,88 @@
-/*
-see :
-
-https://github.com/zip-rs/zip/blob/f6357c59936b51c52146f35c6cf3c15dd206251d/examples/write_dir.rs
-https://docs.rs/tempfile/latest/tempfile/struct.Builder.html
-*/
 use std::fs::File;
-use walkdir::WalkDir;
 use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
+use walkdir::WalkDir;
 use zip::{write::FileOptions, CompressionMethod::Deflated, ZipWriter};
 
-
-pub fn zip_dir(path_to_dir: PathBuf, dest: &File) -> Result<bool, Box<dyn std::error::Error>> {
-
-    //**************** ZIP THE DIR ****************//
+/// Zips the contents of a directory into a destination file
+///
+/// # Arguments
+/// * `path_to_dir` - The directory to zip
+/// * `dest` - The destination file to write the zip to
+///
+/// # Returns
+/// * `Result<(), ZipError>` - Result indicating success or failure
+pub fn zip_dir(path_to_dir: impl AsRef<Path>, dest: &File) -> Result<(), Box<dyn std::error::Error>> {
+    let path_to_dir = path_to_dir.as_ref();
     let mut zip = ZipWriter::new(dest.try_clone()?);
 
-    let options: FileOptions<()> = FileOptions::default()
-        .compression_method(Deflated)
-        .unix_permissions(0o755);
+    // Buffer used for reading files
+    let mut buffer = vec![0; 8192]; // Use a fixed size buffer instead of growing vector
 
-    let walkdir = WalkDir::new(&path_to_dir);
-    let it = walkdir.into_iter();
-    let mut buffer = Vec::new();
+    for entry in WalkDir::new(path_to_dir).into_iter().filter_map(Result::ok) {
+        let path = entry.path();
 
-    for entry in it {
-        let dir_entry = entry.unwrap();
-        let path = dir_entry.path();
-        let name = path
-            .strip_prefix(Path::new(path_to_dir.to_str().unwrap()))
-            .unwrap();
+        // Create relative path from the directory being zipped
+        let name = match path.strip_prefix(path_to_dir) {
+            Ok(name) => name,
+            Err(e) => {
+                eprintln!("Path stripping error: {:?} for {:?}", e, path);
+                continue;
+            }
+        };
 
-        // Write file or directory explicitly
-        // Some unzip tools unzip files with directory paths correctly, some do not!
+        // Skip empty names (root directory)
+        if name.as_os_str().is_empty() {
+            continue;
+        }
+
         if path.is_file() {
-            #[allow(deprecated)]
-            zip.start_file_from_path(name, options)?;
-            let mut f = File::open(path)?;
+            // Create appropriate file options based on file metadata
+            let options = create_file_options(path)?;
 
-            f.read_to_end(&mut buffer)?;
-            zip.write_all(&*buffer)?;
-            buffer.clear();
-        } else if !name.as_os_str().is_empty() {
-            // Only if not root! Avoids path spec / warning
-            // and mapname conversion failed error on unzip
-            #[allow(deprecated)]
-            zip.add_directory_from_path(name, options)?;
+            // Add file to zip
+            zip.start_file(name.to_string_lossy(), options)?;
+
+            // Stream the file instead of loading it entirely into memory
+            let mut file = File::open(path)?;
+            loop {
+                let read_bytes = file.read(&mut buffer)?;
+                if read_bytes == 0 {
+                    break;
+                }
+                zip.write_all(&buffer[..read_bytes])?;
+            }
+        } else if path.is_dir() {
+            // Add directory to zip
+            zip.add_directory(name.to_string_lossy(), FileOptions::default())?;
         }
     }
 
     zip.finish()?;
-    //**************** RETURN THE FILE ****************//
-    return Ok(true);
+    Ok(())
+}
+
+/// Creates appropriate FileOptions based on file metadata
+fn create_file_options(path: &Path) -> Result<FileOptions<()>, Box<dyn std::error::Error>> {
+    let mut options = FileOptions::default()
+        .compression_method(Deflated);
+
+    #[cfg(unix)]
+    {
+        let metadata = std::fs::metadata(path)?;
+        use std::os::unix::fs::PermissionsExt;
+        let permissions = metadata.permissions().mode();
+        options = options.unix_permissions(permissions);
+    }
+    #[cfg(not(unix))]
+    {
+        // Use sensible defaults for non-unix platforms
+        let is_executable = path.extension().map_or(false, |ext|
+            ext == "exe" || ext == "bat" || ext == "cmd" || ext == "sh",
+        );
+
+        options = options.unix_permissions(if is_executable { 0o755 } else { 0o644 });
+    }
+
+    Ok(options)
 }

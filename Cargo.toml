@@ -3,26 +3,32 @@ name = "filedrop-v2"
 version = "2.0.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [profile.release]
-opt-level = 'z'     # Optimize for size
-lto = true          # Enable link-time optimization
-codegen-units = 1   # Reduce number of codegen units to increase optimizations
-panic = 'abort'     # Abort on panic
-strip = true        # Strip symbols from binary*
-
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = 'abort'
+strip = true
 
 [dependencies]
-rocket = { version = "0.5.1" }
-rocket-include-static-resources = "0.10.5"
-fsio = "0.4.1"
+# Base
+tokio = { version = "1.44.2", features = ["rt", "rt-multi-thread", "macros"] }
 dotenv = "0.15.0"
 mime_guess = "2.0.5"
-serde = "1.0.219"
+serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
-chrono = "0.4.40"
+chrono = { version = "0.4.40", features = ["serde"] }
 
-#FOLDER SUPPORT
-zip = { version = "2.5.0"}
+# File/folder support
+zip = "2.5.0"
 tempfile = "3.19.1"
 walkdir = "2.5.0"
+
+# Poem web framework
+poem = { version = "2.0.0", features = ["multipart", "websocket", "compression", "cookie"] }
+# Error handling
+thiserror = "1.0.58"
+# Logging & tracing
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+poem-openapi = { version = "2.0.0", features = ["swagger-ui"] }
